@@ -1,22 +1,21 @@
 import Head from "next/head";
-import Image from "next/image";
 import { Inter } from "next/font/google";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useEffect, useMemo } from "react";
 import { Route } from "@/constants/route";
+import { Carousel, Layout, Space } from "antd";
+import styles from "./styles.module.scss";
+import { images } from "../../public/images";
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const { data: session, status } = useSession();
+  const { data: _session, status: _ } = useSession();
 
-  // useEffect(() => {
-  //   console.log(session, status);
-  // }, [session, status]);
-
-  const signOutClick = async () => {
-    await signOut({ redirect: false, callbackUrl: Route.Login });
-  };
+  const banners = useMemo(() => {
+    return [images.banner1, images.banner2, images.banner3];
+  }, []);
 
   return (
     <>
@@ -26,32 +25,28 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <div>
-          <p>hello {session?.user?.email}</p>
-
-          <p onClick={signOutClick} style={{ cursor: "pointer" }}>
-            Sign Out
-          </p>
-
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{" "}
+      <Space direction="vertical" className={styles.container}>
+        <Layout className={styles.layout}>
+          <Carousel
+            autoplay
+            dots={false}
+            dotPosition="bottom"
+            autoplaySpeed={3000}
+            pauseOnFocus={false}
+            pauseOnHover={false}
+            pauseOnDotsHover={false}
+          >
+            {banners.map((banner, index: number) => (
               <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                width={100}
-                height={24}
-                priority
+                src={banner}
+                alt={`banner${index + 1}`}
+                key={index}
+                className={styles.banner}
               />
-            </a>
-          </div>
-        </div>
-      </main>
+            ))}
+          </Carousel>
+        </Layout>
+      </Space>
     </>
   );
 }

@@ -8,6 +8,6 @@ export const login = async (credentials: LoginCredentials) => {
     data: credentials,
   };
 
-  const response = await apiCall<API.LoginResponse>(payload);
+  const response = await apiCall<API.LoginData>(payload);
   return response;
 };

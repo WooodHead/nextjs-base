@@ -2,6 +2,8 @@ import { Method } from "@/constants/auth";
 import { API } from "@/types/api";
 import axios, { AxiosError, AxiosResponse } from "axios";
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export const HEADERS = {
   defaultHeader: {
     "Content-Type": "application/json; charset=UTF-8",
@@ -31,6 +33,37 @@ export const API_URLS = {
     login: () => ({
       endpoint: "/v1/auth/login",
       headers: HEADERS.defaultHeader,
+      method: Method.Post,
+    }),
+  },
+  permission: {
+    getPermissionList: () => ({
+      endpoint: "/v1/permission/filter",
+      headers: HEADERS.header(),
+      method: Method.Post,
+    }),
+    getPermissionById: (id: string) => ({
+      endpoint: `/v1/permission/${id}`,
+      headers: HEADERS.header(),
+      method: Method.Get,
+    }),
+  },
+  role: {
+    getRoleById: (id: string) => ({
+      endpoint: `/v1/role/${id}`,
+      headers: HEADERS.header(),
+      method: Method.Get,
+    }),
+    getRoleList: () => ({
+      endpoint: `/v1/role/filter`,
+      headers: HEADERS.header(),
+      method: Method.Post,
+    }),
+  },
+  reconciliation: {
+    getPaymentHistories: () => ({
+      endpoint: "/v1/payment-history/filter",
+      headers: HEADERS.header(),
       method: Method.Post,
     }),
   },
@@ -73,11 +106,15 @@ export const apiCall = async <T>({
   data,
   headers,
   params,
-}: API.Params): Promise<T> => {
-  const response = await axios.request<T, AxiosResponse<T>, any>({
+}: API.Params): Promise<API.Response<T>> => {
+  const response = await axios.request<
+    API.Response<T>,
+    AxiosResponse<API.Response<T>>,
+    any
+  >({
     method,
     data,
-    url: `${process.env.REACT_APP_API_URL}${endpoint}`,
+    url: `${BASE_URL}${endpoint}`,
     params,
     headers,
     paramsSerializer: {
@@ -96,10 +133,7 @@ axios.interceptors.request.use(
 
 // Response Interceptor
 axios.interceptors.response.use(
-  (response) => {
-    console.log("success: ", response);
-    return response;
-  },
+  (response) => response,
   (error: AxiosError) => {
     throw error;
   }

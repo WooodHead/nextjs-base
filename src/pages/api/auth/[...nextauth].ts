@@ -2,9 +2,10 @@ import NextAuth, { User } from "next-auth";
 import { AuthOptions } from "next-auth";
 import { JWT_MAX_AGE } from "@/constants/time";
 import Credentials from "next-auth/providers/credentials";
-import { decode } from "next-auth/jwt";
+import { JWT, decode } from "next-auth/jwt";
 import { login } from "@/services/auth";
 import { API } from "@/types/api";
+import { AdapterUser } from "next-auth/adapters";
 
 const secret = process.env.NEXTAUTH_SECRET;
 
@@ -54,16 +55,19 @@ export const authOptions: AuthOptions = {
     jwt: async ({ token, user, account }) => {
       // jwt decoding happens here
       // whenever signIn() or getSession() gets called
-      console.log("user ", user);
-
-      if (user) token.user = user;
+      if (user) token.data = user;
       return token;
     },
-    session: async ({ session, user, token }) => {
-      session.user!.name = token.user.name;
-      session.user!.email = token.user.email;
-      session.user!.age = token.user.age;
-      session.user!.id = token.user.id;
+    session: async ({
+      session,
+      user: _,
+      token,
+    }: {
+      session: any;
+      token: JWT;
+      user: AdapterUser;
+    }) => {
+      session.user = token.data;
 
       // console.log(
       //   await decode({
