@@ -1,0 +1,17 @@
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  .top {
+    flex: 1;
+    padding: 1em;
+    background-color: lightpink;
+  }
+
+  .menu {
+    width: 100%;
+    padding: 0 20%;
+  }
+}
