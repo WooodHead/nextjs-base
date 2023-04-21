@@ -48,6 +48,8 @@ export default function Login({ loggedIn }: IProps) {
   };
 
   useEffect(() => {
+    // Navigate back to home page if the user has logged in
+    // but intentionally navigates to login page
     if (loggedIn) router.push(Route.Home);
   }, [loggedIn]);
 

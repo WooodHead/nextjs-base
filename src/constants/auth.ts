@@ -10,3 +10,10 @@ export enum Method {
   Put = "PUT",
   Delete = "DELETE",
 }
+
+export enum ApiPath {
+  PaymentHistory = "/payment-history",
+  Users = "/users",
+  Role = "/role",
+  Permission = "/permission",
+}

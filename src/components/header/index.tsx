@@ -7,11 +7,14 @@ import {
 import { Avatar, Dropdown, Menu, MenuProps, Space } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { images } from "../../../public/images";
 import styles from "./styles.module.scss";
-import { SignOutParams, signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { API } from "@/types/api";
+import { logout } from "@/services/auth";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux";
 
 const items: MenuProps["items"] = [
   {
@@ -29,18 +32,7 @@ const items: MenuProps["items"] = [
 export default function Header() {
   const router = useRouter();
   const { data: session, status: _ } = useSession();
-  const [current, setCurrent] = useState<keyof typeof Route>("Home");
-
-  const signOutHandler = async () => {
-    try {
-      const options: SignOutParams = {
-        callbackUrl: `${window.location.origin}${Route.Login}`,
-      };
-      const _ = await signOut<true>(options);
-    } catch (error: any) {
-      console.log("sign out error: ", error);
-    }
-  };
+  const [current, setCurrent] = useState<keyof typeof Route>();
 
   const onMenuItemClick: MenuProps["onClick"] = (event) => {
     setCurrent(event.key as keyof typeof Route);
@@ -53,19 +45,26 @@ export default function Header() {
     return [
       {
         key: "logout",
-        label: <span onClick={signOutHandler}>Log out</span>,
+        label: <span onClick={logout}>Log out</span>,
       },
     ];
   }, []);
 
-  const goToHome = () => {
-    router.push(Route.Home);
-  };
+  const goToHome = () => router.push(Route.Home);
 
   const displayName = useMemo(() => {
     if (!session) return "";
     return (session.user as API.LoginData).user.name;
   }, [session]);
+
+  useEffect(() => {
+    const keys = Object.keys(Route);
+    keys.forEach((key) => {
+      if (router.asPath === Route[key as keyof typeof Route]) {
+        setCurrent(key as keyof typeof Route);
+      }
+    });
+  }, []);
 
   return (
     <div className={styles.header}>
@@ -89,7 +88,7 @@ export default function Header() {
       <Menu
         className={styles.menu}
         onClick={onMenuItemClick}
-        selectedKeys={[current]}
+        selectedKeys={current ? [current] : undefined}
         items={items}
         mode="horizontal"
       />

@@ -9,10 +9,10 @@ import { API } from "@/types/api";
 import Footer from "../footer";
 import { useQuery } from "@tanstack/react-query";
 import { getRoleById } from "@/services/role";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { updateRole } from "@/redux/role-slice";
 import { RootState } from "@/redux";
-
+import { logout } from "@/services/auth";
 interface IProps {
   children: any;
 }
@@ -21,7 +21,6 @@ export default function Layout({ children }: IProps) {
   const router = useRouter();
   const { data: session, status } = useSession();
   const dispatch = useDispatch();
-  const roleState = useSelector((state: RootState) => state.role);
 
   const roleId = useMemo(() => {
     if (!session) return null;
@@ -30,11 +29,14 @@ export default function Layout({ children }: IProps) {
   }, [session]);
 
   const _ = useQuery(["role", roleId], () => getRoleById(roleId as string), {
-    enabled: Boolean(roleId),
+    enabled: !!roleId,
     onSuccess: (data) => {
       dispatch(updateRole(data.data));
     },
-    onError: (error: any) => {},
+    onError: (_error: any) => {
+      dispatch(updateRole(null));
+      logout();
+    },
   });
 
   const showHeader = useMemo(() => {
@@ -45,18 +47,13 @@ export default function Layout({ children }: IProps) {
     return true;
   }, [router.asPath]);
 
-  const role = useMemo(() => {
-    return roleState.role;
-  }, [roleState]);
-
   useEffect(() => {
-    // Navigate back to home page if the user has logged in
-    // but intentionally navigates to login page
     const inLoginPage = router.asPath === Route.Login;
     if (!inLoginPage && !session && status !== SessionStatus.Loading) {
       router.push(Route.Login);
     }
 
+    // login
     if (session) {
       const { access, refresh } = (session.user as API.LoginData).tokens;
       localStorage.setItem("accessToken", access.token);
@@ -66,13 +63,11 @@ export default function Layout({ children }: IProps) {
 
   return (
     <div className={styles.container}>
-      {role && (
-        <>
-          {showHeader && <Header />}
-          {children}
-          <Footer />
-        </>
-      )}
+      <>
+        {showHeader && <Header />}
+        {children}
+        <Footer />
+      </>
     </div>
   );
 }

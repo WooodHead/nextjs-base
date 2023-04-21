@@ -38,7 +38,7 @@ export namespace API {
       createdBy: string;
       description: string;
       metaData: any;
-      method: keyof typeof Method;
+      method: "GET" | "POST" | "PUT" | "DELETE";
       name: string;
       path: string;
       status: boolean;
@@ -119,3 +119,8 @@ export namespace API {
     updatedBy: string;
   };
 }
+
+export type TableFilter = {
+  options: Record<string, any>;
+  filter: Record<string, any>;
+};

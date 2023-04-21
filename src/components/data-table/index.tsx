@@ -14,9 +14,9 @@ const DataTable = <
   defaultData = [],
   dataSource,
   postData,
-  locale = "en-US" as any,
+  // locale = enUS.Table,
   pagination,
-  sticky = { offsetHeader: 50 },
+  sticky = { offsetHeader: 0 },
   loading,
   rowKey = (record) => record.id,
   scroll = { x: 2000 },
@@ -37,7 +37,7 @@ const DataTable = <
       defaultData={defaultData}
       dataSource={dataSource}
       postData={postData}
-      locale={locale}
+      // // locale={locale}
       pagination={pagination}
       sticky={sticky}
       loading={loading}

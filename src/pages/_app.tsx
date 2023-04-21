@@ -7,6 +7,9 @@ import { queryClient } from "@/config/react-query";
 import { Provider } from "react-redux";
 import { store } from "@/redux";
 
+import enUS from "antd/lib/locale/en_US";
+import { ConfigProvider } from "antd";
+
 export default function App({
   Component,
   pageProps: { session, ...pageProps },
@@ -16,9 +19,11 @@ export default function App({
       <SessionProvider session={session} refetchOnWindowFocus={false}>
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+            <ConfigProvider locale={enUS}>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </ConfigProvider>
           </QueryClientProvider>
         </Provider>
       </SessionProvider>
